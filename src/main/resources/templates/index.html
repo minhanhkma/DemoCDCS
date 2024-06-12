@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Website Analyzer</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4">Website Analyzer</h2>
+        <form id="analyzeForm" class="mt-4">
+            <div class="form-group">
+                <label for="url">Enter URL:</label>
+                <input type="text" class="form-control" id="url" name="url" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </form>
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#analyzeForm').on('submit', function(event) {
+                event.preventDefault();
+                var url = $('#url').val();
+                $.ajax({
+                    url: '/api/analysis-results/analyze-url',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ url: url }),
+                    success: function(result) {
+                        $('#result').html(`
+                            <h3>Analysis Result</h3>
+                            <p><strong>Safety Score:</strong> ${result.safetyScore}</p>
+                            <p><strong>Scan Date:</strong> ${result.scanDate}</p>
+                            <p><strong>Details:</strong> ${result.resultDetails}</p>
+                        `);
+                    },
+                    error: function(xhr) {
+                        $('#result').html('<p class="text-danger">Error occurred during analysis: ' + xhr.responseText + '</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
